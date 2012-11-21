@@ -44,7 +44,7 @@ else
                 echo "create database $dbname" | mysql --user=$dbuser --password=$dbpass
             else
                 dropdb $dbname
-                createdb $dbname
+                createdb  -T template_postgis $dbname
             fi
         fi
         echo "no" | python manage.py syncdb
