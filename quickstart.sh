@@ -56,8 +56,13 @@ if  $INSTALL_APTITUDE ; then
         fi
     fi
 
-    export INSTALL_POSTGRES
-    ./install/geodjango_requirements.sh
+    echo "Do you want to install geodjango requirements? [Y/n]"
+    read INSTALL_GEODJANGO_REQ
+    if [[ $INSTALL_GEODJANGO_REQ == 'Y' || $INSTALL_GEODJANGO_REQ == 'y' ]]
+    then
+        export INSTALL_POSTGRES
+        ./install/geodjango_requirements.sh
+    fi
 
     # set a new virtual environment
     virtualenv .env --distribute
