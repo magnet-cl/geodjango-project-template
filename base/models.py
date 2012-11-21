@@ -5,10 +5,11 @@ All apps should use the BaseModel as parent for all models
 All apps should use the base.User model for all users
 """
 
+from base.managers import UserManager
 from django.conf import settings
-from django.contrib.auth.models import User as DjangoUser, UserManager
+from django.contrib.auth.models import User as DjangoUser
 from django.core.mail import EmailMultiAlternatives
-from django.db import models
+from django.contrib.gis.db import models
 from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext_lazy as _
@@ -42,6 +43,8 @@ class User(DjangoUser, BaseModel):
     token = models.CharField(
         max_length=30, default="", blank=True,
         help_text="A token that can be used to verify the user's email")
+    point = models.PointField(null=True)
+
     # Use UserManager to get the create_user method, etc.
     objects = UserManager()
 
