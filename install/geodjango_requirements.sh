@@ -20,9 +20,15 @@ rm -rf geos-3.3.5
 
 
 # REQUIRED BY POSTGRES
-echo "Are you going to use postgre for your database? [N/y]"
-read INSTALL_POSTGRE
-if [[ "$INSTALL_POSTGRE" == "y" ]]
+if [[ $INSTALL_POSTGRES ]]
+then
+    echo "Installing PROJ.4, PostGIS and GDAL"
+else
+    echo "Are you going to use postgres for your database? [N/y]"
+    read INSTALL_POSTGRES
+fi
+
+if [[ "$INSTALL_POSTGRES" == "y" ]]
 then
     #PROJ.4 is a library for converting geospatial data to different coordinate
     #reference systems.
@@ -48,7 +54,7 @@ else
     read INSTALL_SQLITE
 fi
 
-if [[ "$INSTALL_POSTGRE" == "y" || "$INSTALL_SQLITE" == "y" ]]
+if [[ "$INSTALL_POSTGRES" == "y" || "$INSTALL_SQLITE" == "y" ]]
 then
     #!!!GEOS, PROJ.4 and GDAL should be installed prior to building PostGIS
 
@@ -70,7 +76,7 @@ then
 fi
 
 ###https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/postgis/ ##
-if [[ "$INSTALL_POSTGRE" == "y" ]]
+if [[ "$INSTALL_POSTGRES" == "y" ]]
 then
     # needed by PostGis
     # http://www.postgis.org/documentation/manual-2.0/postgis_installation.html

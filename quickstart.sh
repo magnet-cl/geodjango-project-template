@@ -45,15 +45,19 @@ if  $INSTALL_APTITUDE ; then
         # Install mysql related packages
         yes | sudo apt-get install libmysqlclient-dev python-mysqldb
     else
-        echo "Are you going to use postgre for your database? [N/y]"
-        read INSTALL_POSTGRE
+        echo "Are you going to use postgres for your database? [N/y]"
+        read INSTALL_POSTGRES
 
-        if [[ "$INSTALL_POSTGRE" == "y" ]]
+        if [[ "$INSTALL_POSTGRES" == "y" ]]
         then
             ./install/postgres.sh
+        else
+            INSTALL_POSTGRES="n"
         fi
     fi
 
+    export INSTALL_POSTGRES
+    ./install/geodjango_requirements.sh
 
     # set a new virtual environment
     virtualenv .env --distribute
@@ -75,7 +79,7 @@ source .env/bin/activate
 if [[ "$INSTALL_MYSQL" == "y" ]]
 then
     pip install MySQL-python
-elif [[ "$INSTALL_POSTGRE" == "y" ]]
+elif [[ "$INSTALL_POSTGRES" == "y" ]]
 then
     pip install psycopg2
 fi
