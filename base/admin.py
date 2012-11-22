@@ -10,7 +10,6 @@ from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import User as DjangoUser
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.gis.geos import GEOSGeometry
 
 
 ERROR_MESSAGE = _("Please enter the correct email and password "
@@ -108,16 +107,16 @@ class UserChangeForm(DjangoUserChangeForm):
     class Meta:
         model = User
 
-class ModelWithPointAdmin(gisAdmin.GeoModelAdmin):
-    g = GEOSGeometry('SRID=3857;POINT(-7862967.8670106 -3953427.0642935)')
-    default_lon = int(g.x)
-    default_lat = int(g.y)
+class GoogleAdmin(gisAdmin.GeoModelAdmin):
+    # set the default location
+    default_lon = -33.427186
+    default_lat = -70.619946
     default_zoom = 11
     extra_js = ["http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"]
-    map_template = 'admin/gmgdav3.html'
+    map_template = 'admin/google_maps.html'
 
 
-class UserAdmin(DjangoUserAdmin, ModelWithPointAdmin):
+class UserAdmin(DjangoUserAdmin, GoogleAdmin):
     """ Configuration for the User admin page"""
     add_form_template = 'admin/base/user/add_form.html'
     add_form = UserCreationForm
