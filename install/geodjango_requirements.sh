@@ -82,15 +82,8 @@ then
     # http://www.postgis.org/documentation/manual-2.0/postgis_installation.html
     sudo aptitude install postgresql-server-dev-9.1 libxml2-dev
 
-    wget http://postgis.refractions.net/download/postgis-2.0.1.tar.gz
-    tar xzf postgis-2.0.1.tar.gz
-    cd postgis-2.0.1
-    ./configure
-    make
-    sudo make install
-    cd ..
-    rm -rf postgis-2.0.1.tar.gz
-    rm -rf postgis-2.0.1
+    # postgis installation
+    sudo aptitude install postgis postgresql-9.1-postgis
 
     ./install/postgis_template.sh
 fi

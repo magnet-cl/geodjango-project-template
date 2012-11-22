@@ -4,7 +4,7 @@ createdb -E UTF8 template_postgis
 createlang -d template_postgis plpgsql
 
 PGSHARE=`pg_config --sharedir`
-PGSQL=`find $PGSHARE -name postgis.sql -o -name postgis-32.sql | tail -n 1`
+PGSQL=`find $PGSHARE -name postgis.sql | tail -n 1`
 PGSQLSP=`find $PGSHARE -name spatial_ref_sys.sql | tail -n 1`
 
 # Allows non-superusers the ability to create from this template
