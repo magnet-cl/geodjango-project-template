@@ -58,7 +58,14 @@ if  $INSTALL_APTITUDE ; then
 
     echo "Do you want to install geodjango requirements? [Y/n]"
     read INSTALL_GEODJANGO_REQ
-    if [[ $INSTALL_GEODJANGO_REQ == ' ' || $INSTALL_GEODJANGO_REQ == 'y' ]]
+
+    if [[ $INSTALL_GEODJANGO_REQ == '' ]]
+    then
+        # set the default value for the option
+        INSTALL_GEODJANGO_REQ="Y"
+    fi
+
+    if [[ $INSTALL_GEODJANGO_REQ == 'Y' || $INSTALL_GEODJANGO_REQ == 'y' ]]
     then
         export INSTALL_POSTGRES
         ./install/geodjango_requirements.sh
