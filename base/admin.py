@@ -1,5 +1,6 @@
 """ Admin page configuration for the api """
 from django.contrib import admin
+from django.contrib.gis import admin as gisAdmin
 
 from base.models import User
 
@@ -9,6 +10,7 @@ from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import User as DjangoUser
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.gis.geos import GEOSGeometry
 
 
 ERROR_MESSAGE = _("Please enter the correct email and password "
@@ -106,9 +108,18 @@ class UserChangeForm(DjangoUserChangeForm):
     class Meta:
         model = User
 
+class ModelWithPointAdmin(gisAdmin.GeoModelAdmin):
+    g = GEOSGeometry('SRID=3857;POINT(-7862967.8670106 -3953427.0642935)')
+    default_lon = int(g.x)
+    default_lat = int(g.y)
+    default_zoom = 11
+    extra_js = ["http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"]
+    map_template = 'admin/gmgdav3.html'
 
-class UserAdmin(DjangoUserAdmin):
+
+class UserAdmin(DjangoUserAdmin, ModelWithPointAdmin):
     """ Configuration for the User admin page"""
+    add_form_template = 'admin/base/user/add_form.html'
     add_form = UserCreationForm
     list_display = ('email', 'first_name', 'last_name', 'is_staff')
     form = UserChangeForm
@@ -118,6 +129,7 @@ class UserAdmin(DjangoUserAdmin):
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (_('Geo data'), {'fields': ('point',)}),
     )
     add_fieldsets = (
         (None, {
