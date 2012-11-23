@@ -145,7 +145,6 @@
     // to transform back to original SRID).
     google.maps.event.addListener({{ module }}.map, 'click', function(event){
       marker.setPosition(event.latLng);
-      debugger;
       var admin_geom = {{ module }}.read_wkt(
         'Point(' + event.latLng.lng() + ' ' + event.latLng.lat() +')');
       {{ module }}.write_wkt(admin_geom);
