@@ -118,7 +118,7 @@
           admin_geom.geometry.y, admin_geom.geometry.x);
     }
     else{
-      position = new google.maps.LatLng({{ default_lon }}, {{ default_lat }});
+      position = new google.maps.LatLng({{ default_lat }}, {{ default_lon }});
     }
 
     // The options hash, w/ zoom, resolution, and projection settings.
