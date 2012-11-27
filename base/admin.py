@@ -47,8 +47,8 @@ admin.site.unregister(DjangoUser)
 
 class GoogleAdmin(gisAdmin.GeoModelAdmin):
     # set the default location
-    default_lon = -33.427186
-    default_lat = -70.619946
+    default_lat = -33.427186
+    default_lon = -70.619946
     default_zoom = 11
     extra_js = ["http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"]
     map_template = 'admin/google_maps.html'

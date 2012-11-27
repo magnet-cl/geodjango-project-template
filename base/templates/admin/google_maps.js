@@ -69,7 +69,7 @@
   {{ module }}.deleteFeatures();
   document.getElementById('{{ id }}').value = '';
   {% localize off %}
-  {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
+  {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon|stringformat:"f" }}, {{ default_lat|stringformat:"f" }}), {{ default_zoom }});
   {% endlocalize %}
 }
 // Add Select control
@@ -118,7 +118,7 @@
           admin_geom.geometry.y, admin_geom.geometry.x);
     }
     else{
-      position = new google.maps.LatLng({{ default_lat }}, {{ default_lon }});
+      position = new google.maps.LatLng({{ default_lat|stringformat:"f" }}, {{ default_lon|stringformat:"f" }});
     }
 
     // The options hash, w/ zoom, resolution, and projection settings.
