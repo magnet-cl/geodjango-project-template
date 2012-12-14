@@ -10,7 +10,7 @@ import gunicorn
 import nginx
 import deb_handler
 from db import install_mysql
-from utils import backup_db, git_clone
+from utils import backup_db, git_clone, git_checkout
 
 
 @task
@@ -46,9 +46,9 @@ def restart():
 
 @task
 def update_restart():
-    """ Restarts gunicorn and nginx. """
-    restart()
+    """ Updates server repository and restarts gunicorn and nginx """
     update()
+    restart()
 
 
 @task
@@ -70,14 +70,15 @@ def db_reset():
     """ Resets database. """
     print('Are you sure you want to reset the database?')
     host = prompt('Type in the host to confirm: ')
-    if host == env.host:
+    branch = prompt('Type in the branch to confirm: ')
+    if host == env.host and branch == env.branch:
         # backup database before resetting
         backup_db()
         with cd(env.server_root_dir):
             with prefix('. .env/bin/activate'):
                 run('./reset.sh')
     else:
-        print('Invalid host: %s != %s' % (host, env.host))
+        print('Invalid host or branch.')
 
 
 @task
@@ -95,7 +96,11 @@ def initial_deploy():
 
     # clone repository
     deb_handler.install('git')
-    git_clone(env.server_git_url)
+    git_clone(env.server_git_url, env.server_root_dir)
+
+    # checkout branch
+    with cd(env.server_root_dir):
+        git_checkout(env.branch)
 
     # mysql installation
     install_mysql()
