@@ -1,48 +1,54 @@
-""" Admin page configuration for the api """
+""" Admin base configuration """
 from django.contrib import admin
 from django.contrib.gis import admin as gisAdmin
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.utils.translation import ugettext as _
+from django.views.decorators.cache import never_cache
 
-from base.models import User
-from base.forms import UserCreationForm
-from base.forms import UserChangeForm
-
-from django import forms
-from django.contrib.auth import authenticate
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.contrib.auth.models import User as DjangoUser
-from django.utils.translation import ugettext_lazy as _
+from users.forms import AdminAuthenticationForm
+from users.forms import CaptchaAuthenticationForm
 
 
-ERROR_MESSAGE = _("Please enter the correct email and password "
-        "for a staff account. Note that both fields are case-sensitive.")
+class AdminSite(admin.sites.AdminSite):
+    login_form = AdminAuthenticationForm
 
+    @never_cache
+    def login(self, request, extra_context=None):
+        """
+        Displays the login form for the given HttpRequest.
+        """
+        from django.contrib.auth.views import login
 
-# we are going to override the email login
-class AdminAuthenticationForm(admin.forms.AdminAuthenticationForm):
-    """ Subclass which overrides the 'clean' method the email is accepted
-    instead of the username
+        def captched_form(req=None, data=None):
+            return CaptchaAuthenticationForm(
+                req, data, initial={'captcha': request.META['REMOTE_ADDR']})
 
-    """
-    def clean(self):
-        """ takes the email and password and authenticates with it """
+        # If the form has been submitted...
+        template_name = "accounts/login.html"
 
-        email = self.cleaned_data.get('username')
-        password = self.cleaned_data.get('password')
-        message = ERROR_MESSAGE
+        context = {
+            'title': _('Log in'),
+            'app_path': request.get_full_path(),
+            REDIRECT_FIELD_NAME: request.get_full_path(),
+        }
+        context.update(extra_context or {})
 
-        if email and password:
-            self.user_cache = authenticate(email=email, password=password)
-            if self.user_cache is None:
-                raise forms.ValidationError(message)
-            elif not self.user_cache.is_active or not self.user_cache.is_staff:
-                raise forms.ValidationError(message)
-        self.check_for_test_cookie()
-        return self.cleaned_data
-admin.sites.AdminSite.login_form = AdminAuthenticationForm
+        login_form = AdminAuthenticationForm
 
-#we are going to configure the user admin, so we first need to unregister
-# the default one
-admin.site.unregister(DjangoUser)
+        if request.method == "POST":
+            login_try_count = request.session.get('login_try_count', 0)
+            request.session['login_try_count'] = login_try_count + 1
+
+            if login_try_count >= 2:
+                login_form = captched_form
+
+        defaults = {
+            'extra_context': context,
+            'current_app': self.name,
+            'authentication_form': self.login_form or login_form,
+            'template_name': self.login_template or template_name,
+        }
+        return login(request, **defaults)
 
 
 class GoogleAdmin(gisAdmin.GeoModelAdmin):
@@ -53,27 +59,4 @@ class GoogleAdmin(gisAdmin.GeoModelAdmin):
     extra_js = ["http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"]
     map_template = 'admin/google_maps.html'
 
-
-class UserAdmin(DjangoUserAdmin, GoogleAdmin):
-    """ Configuration for the User admin page"""
-    add_form_template = 'admin/base/user/add_form.html'
-    add_form = UserCreationForm
-    list_display = ('email', 'first_name', 'last_name', 'is_staff')
-    form = UserChangeForm
-    fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
-                                       'groups', 'user_permissions')}),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-        (_('Geo data'), {'fields': ('point',)}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'first_name', 'last_name', 'password1',
-                'password2')}
-        ),
-    )
-
-admin.site.register(User, UserAdmin)
+admin.site = AdminSite()

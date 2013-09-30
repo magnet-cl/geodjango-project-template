@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.jade" %}
 
 {% load i18n static %}
 
@@ -14,7 +14,7 @@
 
 
 
-<form method="post" action="{% url 'base.views.user_new' %}">
+<form method="post" action="{% url 'users.views.user_new' %}">
 {% csrf_token %}
 <table>
   {% for field in form.visible_fields %}
@@ -32,7 +32,7 @@
   {% endfor %}
 </table>
 
-<input type="submit" value="{% trans 'Register' %}" />
+<input type="submit" value="{% trans 'Register' %}" class="btn"/>
 </form>
 
 {% endblock %}

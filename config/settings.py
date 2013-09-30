@@ -9,7 +9,7 @@ try:
     from local_settings import LOCAL_DEBUG, LOCAL_DATABASES
 except:
     import dj_database_url
-    DATABASES['default'] =  dj_database_url.config()
+    DATABASES['default'] = dj_database_url.config()
     DEBUG = True
 else:
     DATABASES.update(LOCAL_DATABASES)
@@ -56,12 +56,10 @@ if TEST:
 
 TEMPLATE_DEBUG = DEBUG
 
-AUTH_PROFILE_MODULE = "base.User"
-
 # Since we are using our custom user model, we need to set the authentication
 # backend to the CustomBackend, so it returns the User model
 AUTHENTICATION_BACKENDS = (
-    'base.backends.CustomBackend',
+    'users.backends.CustomBackend',
 )
 
 ADMINS = (
@@ -79,7 +77,7 @@ TIME_ZONE = 'America/Chicago'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 SITE_ID = 1
 
@@ -125,7 +123,8 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'compressor.finders.CompressorFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -133,9 +132,10 @@ SECRET_KEY = 'u9+6rx&amp;&amp;mfv8xjm#t5_73bs45x06t6w-xsu_m2jt2)=&amp;95d_b^'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    ('pyjade.ext.django.Loader', (
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    )),
 )
 
 MIDDLEWARE_CLASSES = (
@@ -172,8 +172,11 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    #'south',
+    "compressor",
     'base',
+    'users',
+    'django_admin_bootstrapped',
+    'django.contrib.admin',
 )
 # Set the apps that are installed locally
 try:
@@ -214,3 +217,13 @@ LOGGING = {
 
 # user loggin
 LOGIN_REDIRECT_URL = "/"
+
+# Tuple of IP addresses, as strings, that:
+#   * See debug comments, when DEBUG is true
+#   * Receive x-headers
+INTERNAL_IPS = ('127.0.0.1',)
+
+AUTH_USER_MODEL = 'users.User'
+
+RECAPTCHA_PUBLIC = '6LfLr90SAAAAABRD5AIfqIIYyIJ8Ls698OkQacNy'
+RECAPTCHA_PRIVATE = '6LfLr90SAAAAAMJ63_e1jrxg-31NAJynZtF3VGmJ'
