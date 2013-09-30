@@ -25,7 +25,9 @@ if  $HEROKU ; then
     heroku pg:reset DATABASE
     heroku run python manage.py syncdb
 else
+    engine=`python -c"from config.local_settings import LOCAL_DATABASES; print LOCAL_DATABASES['default']['ENGINE']"`
     debug=`python -c"from config.local_settings import LOCAL_DEBUG; print LOCAL_DEBUG"`
+    dbname=`python -c"from config.local_settings import LOCAL_DATABASES; print LOCAL_DATABASES['default']['NAME']"`
     south_installed=`python -c"from config.settings import INSTALLED_APPS; print 'south' in INSTALLED_APPS"`
 
     if [ $debug = "True" ] ; then
