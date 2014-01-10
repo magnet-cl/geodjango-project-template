@@ -3,19 +3,25 @@ LOCAL_DEBUG = True
 LOCAL_DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis', 
-        'NAME': 'django-db',                      # Or path to database file if using sqlite3.
+        'NAME': 'database-name', 
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+
+        # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '',    
+        # Set to empty string for default. Not used with sqlite3.
+        'PORT': '',
     }
 }
 
 LOCAL_EMAIL_SETTINGS = {
-    'EMAIL_HOST_USER': 'username',
-    'EMAIL_HOST_PASSWORD': 'password',
-    'EMAIL_SENDER_NAME': "mi nombre",
-    'SENDER_EMAIL': "hello@example.com",
+    'EMAIL_SENDER_NAME': "Sender name",
+    'SENDER_EMAIL': 'sender email',
+
+    # Amazon AWS settings
+    'AWS_ACCESS_KEY_ID': 'AWS_ACCESS_KEY_ID',
+    'AWS_SECRET_ACCESS_KEY': 'AWS_SECRET_ACCESS_KEY',
+    'ENABLE_EMAILS': False,
 }
 
 LOCALLY_INSTALLED_APPS = (

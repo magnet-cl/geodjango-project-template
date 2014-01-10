@@ -31,30 +31,18 @@ do
      esac
 done
 
+if  $INSTALL_NODE ; then
+    echo "Installing bower (Requires Node)"
+    sudo npm install -g bower
+fi
+
 if  $INSTALL_APTITUDE ; then
-    # sudo install virtual env and other things with aptitude
+    echo "Installing aptitude dependencies"
 
     # Install base packages
     yes | sudo apt-get install python-pip python-virtualenv python-dev 
 
-    echo "Are you going to use mysql for your database? [N/y]"
-    read INSTALL_MYSQL
-
-    if [[ "$INSTALL_MYSQL" == "y" ]]
-    then
-        # Install mysql related packages
-        yes | sudo apt-get install libmysqlclient-dev python-mysqldb
-    else
-        echo "Are you going to use postgres for your database? [N/y]"
-        read INSTALL_POSTGRES
-
-        if [[ "$INSTALL_POSTGRES" == "y" ]]
-        then
-            ./install/postgres.sh
-        else
-            INSTALL_POSTGRES="n"
-        fi
-    fi
+    ./install/postgres.sh
 
     echo "Do you want to install geodjango requirements? [Y/n]"
     read INSTALL_GEODJANGO_REQ
@@ -73,18 +61,21 @@ if  $INSTALL_APTITUDE ; then
 
     if [ ! -f .env ] ; then
         # set a new virtual environment
-        virtualenv .env --distribute
+        virtualenv .env
     fi
 fi
+
 if  $INSTALL_PIP ; then
     # activate the environment
     source .env/bin/activate
 
-    # update easy_install (used by pip)
-    easy_install -U distribute
+    # install setuptools
+    pip install --upgrade setuptools
 
     # install pip requiredments in the virtual environment
-    .env/bin/pip install --requirement install/requirements.pip
+    .env/bin/pip install --download-cache=~/.pip-cache --requirement install/requirements.pip
+
+    pip install psycopg2
 
 fi
 
@@ -126,6 +117,14 @@ fi
 # create the local_settings file if it does not exist
 if [ ! -f ./config/local_settings.py ] ; then
     cp config/local_settings.py.default config/local_settings.py
-    EXP="s/django-db/${PWD##*/}/g"
+
+    EXP="s/database-name/${PWD##*/}/g"
     echo $i|sed -i $EXP config/local_settings.py
+    
+    echo "remember to set in config/local_setings.py your database"
+    echo "settings"
 fi
+
+cd base/static
+bower install
+cd ../..

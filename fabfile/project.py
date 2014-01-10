@@ -5,9 +5,12 @@ from fabric.api import prompt
 from fabric.api import put
 from fabric.api import run
 from fabric.api import task
+from fabric.api import local
+from fabric.contrib import files
 
 import gunicorn
 import nginx
+import bower
 import deb_handler
 from db import install_mysql
 from utils import backup_db, git_clone, git_checkout
@@ -31,6 +34,9 @@ def update_server():
     backup_db()
 
     update_helper(env.server_root_dir)
+
+    bower.update()
+
     with cd(env.server_root_dir):
         with prefix('. .env/bin/activate'):
             run('pip install --requirement install/requirements.pip')
@@ -82,20 +88,32 @@ def db_reset():
 
 
 @task
+def set_deploy_key():
+    # put ssh key
+    ssh_key = '%s/fabfile/templates/ssh_key'
+    ssh_key %= env.local_root_dir
+
+    if not files.exists(ssh_key):
+        local('ssh-keygen -t rsa -f %s' % ssh_key)
+
+    run('mkdir -p -m 0700 .ssh')
+    put(ssh_key, '.ssh/id_rsa', mode=0600)
+
+
+@task
 def initial_deploy():
     """ Performs a complete deploy of the project. """
 
     # put ssh key
-    ssh_key = '%s/fabfile/templates/ssh_key'
-    ssh_key %= env.local_root_dir
-    run('mkdir -p -m 0700 .ssh')
-    put(ssh_key, '.ssh/id_rsa', mode=0600)
+    set_deploy_key()
 
     # github host handshake
     run('ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts')
 
+    # install necessary dependencies to handle the project
+    install_project_handling_dependencies()
+
     # clone repository
-    deb_handler.install('git')
     git_clone(env.server_git_url, env.server_root_dir)
 
     # checkout branch
@@ -109,6 +127,9 @@ def initial_deploy():
     with cd(env.server_root_dir):
         run('./quickstart.sh')
 
+    # bower installation
+    bower.install()
+
     # gunicorn installation and configuration
     gunicorn.install()
     gunicorn.add_gunicorn_service()
@@ -118,3 +139,10 @@ def initial_deploy():
     nginx.install()
     nginx.add_django_site()
     nginx.start()
+
+
+@task
+def install_project_handling_dependencies():
+    # install zip dependencies
+    deb_handler.install('zip')
+    deb_handler.install('unzip')
