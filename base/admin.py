@@ -1,6 +1,6 @@
 """ Admin base configuration """
 from django.contrib import admin
-from django.contrib.gis import admin as gisAdmin
+from django.contrib.gis import admin as gis_admin
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
@@ -51,7 +51,7 @@ class AdminSite(admin.sites.AdminSite):
         return login(request, **defaults)
 
 
-class GoogleAdmin(gisAdmin.GeoModelAdmin):
+class GoogleAdmin(gis_admin.GeoModelAdmin):
     # set the default location
     default_lat = -33.427186
     default_lon = -70.619946
