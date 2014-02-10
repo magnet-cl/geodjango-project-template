@@ -178,6 +178,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'bootstrap_admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -191,7 +192,6 @@ INSTALLED_APPS = (
     "compressor",
     'base',
     'users',
-    'bootstrap_admin',
     'django.contrib.admin',
     'django_tables2',
 )
