@@ -80,14 +80,7 @@ if  $INSTALL_PIP ; then
 fi
 
 # update pip database requirements
-source .env/bin/activate
-if [[ "$INSTALL_MYSQL" == "y" ]]
-then
-    pip install MySQL-python
-elif [[ "$INSTALL_POSTGRES" == "y" ]]
-then
-    pip install psycopg2
-fi
+pip install psycopg2
 
 # HEROKU 
 if  $INSTALL_HEROKU ; then

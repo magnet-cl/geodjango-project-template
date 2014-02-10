@@ -19,80 +19,52 @@ rm -rf geos-3.3.5.tar.bz2
 rm -rf geos-3.3.5
 
 
-# REQUIRED BY POSTGRES
-if [[ $INSTALL_POSTGRES ]]
-then
-    echo "Installing PROJ.4, PostGIS and GDAL"
-else
-    echo "Are you going to use postgres for your database? [N/y]"
-    read INSTALL_POSTGRES
-fi
+#PROJ.4 is a library for converting geospatial data to different coordinate
+#reference systems.
+wget http://download.osgeo.org/proj/proj-4.8.0.tar.gz
+wget http://download.osgeo.org/proj/proj-datumgrid-1.5.tar.gz
+# Next, untar the source code archive, and extract the datum shifting files
+# in the nad subdirectory. This must be done prior to configuration:
+tar xzf proj-4.8.0.tar.gz
+cd proj-4.8.0/nad
+tar xzf ../../proj-datumgrid-1.5.tar.gz
+cd ..
+#Finally, configure, make and install PROJ.4:
+./configure
+make
+sudo make install
+cd ..
+rm -rf proj-4.8.0.tar.gz
+rm -rf proj-4.8.0
+rm -rf proj-datumgrid-1.5.tar.gz
+rm -rf proj-datumgrid-1.5
 
-if [[ "$INSTALL_POSTGRES" == "y" ]]
-then
-    #PROJ.4 is a library for converting geospatial data to different coordinate
-    #reference systems.
-    wget http://download.osgeo.org/proj/proj-4.8.0.tar.gz
-    wget http://download.osgeo.org/proj/proj-datumgrid-1.5.tar.gz
-    # Next, untar the source code archive, and extract the datum shifting files
-    # in the nad subdirectory. This must be done prior to configuration:
-    tar xzf proj-4.8.0.tar.gz
-    cd proj-4.8.0/nad
-    tar xzf ../../proj-datumgrid-1.5.tar.gz
-    cd ..
-    #Finally, configure, make and install PROJ.4:
-    ./configure
-    make
-    sudo make install
-    cd ..
-    rm -rf proj-4.8.0.tar.gz
-    rm -rf proj-4.8.0
-    rm -rf proj-datumgrid-1.5.tar.gz
-    rm -rf proj-datumgrid-1.5
-else
-    echo "Are you going to use sqlite for your database? [N/y]"
-    read INSTALL_SQLITE
-fi
+#!!!GEOS, PROJ.4 and GDAL should be installed prior to building PostGIS
 
-if [[ "$INSTALL_POSTGRES" == "y" || "$INSTALL_SQLITE" == "y" ]]
-then
-    #!!!GEOS, PROJ.4 and GDAL should be installed prior to building PostGIS
+# GDAL is an excellent open source geospatial library that has support for
+# reading most vector and raster spatial data formats. Currently, GeoDjango
+# only supports GDAL's vector data capabilities [2]. GEOS and PROJ.4 should
+# be installed prior to building GDAL.
 
-    # GDAL is an excellent open source geospatial library that has support for
-    # reading most vector and raster spatial data formats. Currently, GeoDjango
-    # only supports GDAL's vector data capabilities [2]. GEOS and PROJ.4 should
-    # be installed prior to building GDAL.
+# First download the latest GDAL release version and untar the archive:
+wget http://download.osgeo.org/gdal/gdal-1.9.1.tar.gz
+tar xzf gdal-1.9.1.tar.gz
+cd gdal-1.9.1
+./configure
+make
+sudo make install
+cd ..
+rm -rf gdal-1.9.1.tar.gz
+rm -rf gdal-1.9.1
 
-    # First download the latest GDAL release version and untar the archive:
-    wget http://download.osgeo.org/gdal/gdal-1.9.1.tar.gz
-    tar xzf gdal-1.9.1.tar.gz
-    cd gdal-1.9.1
-    ./configure
-    make
-    sudo make install
-    cd ..
-    rm -rf gdal-1.9.1.tar.gz
-    rm -rf gdal-1.9.1
-fi
 
-###https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/postgis/ ##
-if [[ "$INSTALL_POSTGRES" == "y" ]]
-then
-    # needed by PostGis
-    # http://www.postgis.org/documentation/manual-2.0/postgis_installation.html
-    sudo aptitude install postgresql-server-dev-9.1 libxml2-dev
+# needed by PostGis
+# http://www.postgis.org/documentation/manual-2.0/postgis_installation.html
+sudo aptitude install postgresql-server-dev-9.1 libxml2-dev
 
-    # postgis installation
-    sudo aptitude install postgis postgresql-9.1-postgis
+# postgis installation
+sudo aptitude install postgis postgresql-9.1-postgis
 
-    ./install/postgis_template.sh
-fi
-
-###https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/postgis/ ##
-if [[ "$INSTALL_SQLITE" == "y" ]]
-then
-    # !!! GEOS and PROJ.4 should be installed prior to building SpatiaLite.
-    echo "Not implemented yet :'("
-fi
+./install/postgis_template.sh
 
 echo "Add 'django.contrib.gis' to your INSTALLED_APPS"
