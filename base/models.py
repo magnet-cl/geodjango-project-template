@@ -7,11 +7,12 @@ All apps should use the BaseModel as parent for all models
 from base.managers import BaseManager
 
 # django
-from django.conf import settings
 from django.db import models
 
 # other
 from django.utils import timezone
+
+# standard library
 
 
 class BaseModel(models.Model):
@@ -43,16 +44,3 @@ class BaseModel(models.Model):
         for kw in kwargs:
             self.__setattr__(kw, kwargs[kw])
         self.__class__.objects.filter(pk=self.pk).update(**kwargs)
-
-    def get_image_url(self, field_name="picture", width=None, height=None):
-        """ returns the url of an image stored in the attribute with the name
-        field_name and with the size specified by width and height
-        """
-
-        if width and height:
-            file_path = "{}{}x{}/{}".format(
-                settings.MEDIA_URL, width, height, str(self.picture))
-        else:
-            file_path = "{}{}".format(settings.MEDIA_URL,  str(self.picture))
-
-        return file_path
