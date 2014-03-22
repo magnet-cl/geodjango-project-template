@@ -69,15 +69,16 @@ def password_change(request):
 def password_reset(request):
     """ view that handles the recover password process """
 
-    template_name = "accounts/password_reset_form.html"
+    template_name = "accounts/password_reset_form.jade"
     email_template_name = "emails/password_reset.html"
 
     success_url = "/accounts/password_email_sent"
 
-    res = auth_views.password_reset(request,
-                                    post_reset_redirect=success_url,
-                                    template_name=template_name,
-                                    email_template_name=email_template_name)
+    res = auth_views.password_reset(
+        request,
+        post_reset_redirect=success_url,
+        template_name=template_name,
+        email_template_name=email_template_name)
     return res
 
 
@@ -108,7 +109,8 @@ def password_reset_complete(request):
 
 def user_new(request):
     if request.method == 'POST':
-        form = CaptchaUserCreationForm(request.POST)
+        form = CaptchaUserCreationForm(
+            request.POST, initial={'captcha': request.META['REMOTE_ADDR']})
         if form.is_valid():
             form.save(verify_email_address=True, request=request)
             messages.add_message(request, messages.INFO,
