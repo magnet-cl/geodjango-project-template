@@ -1,7 +1,7 @@
 {
-  "name": "django-project-template",
+  "name": "geodjango-project-template",
   "version": "0.0.0",
-  "homepage": "https://bitbucket.org/magnet-cl/django-project-template",
+  "homepage": "https://bitbucket.org/magnet-cl/geodjango-project-template",
   "authors": [
     "Ignacio Munizaga <ignacio.munizaga.t@gmail.com>"
   ],
