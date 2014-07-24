@@ -25,8 +25,6 @@ from django.utils.translation import ugettext_noop
 
 # standard library
 from threading import Thread
-import base64
-import os
 import time
 
 # base
@@ -68,14 +66,11 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
                     'active. Unselect this instead of deleting accounts.'),
     )
     point = models.PointField(null=True)
+
     # auto fields
     date_joined = models.DateTimeField(
         _('date joined'), default=timezone.now,
         help_text=_("The date this user was created in the database"),
-    )
-    token = models.CharField(
-        max_length=30, default="", blank=True,
-        help_text="A token that can be used to verify the user's email"
     )
     # Use UserManager to get the create_user method, etc.
     objects = UserManager()
@@ -108,14 +103,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         """
         send_mail(subject, message, from_email, [self.email])
 
-    # custom methods
-    def set_random_token(self):
-        """ generate a random token """
-        token = base64.urlsafe_b64encode(os.urandom(30))[:30]
-        self.token = token
-        self.save()
-        return token
-
     # public methods
     def save(self, *args, **kwargs):
         """ store all emails in lowercase """
@@ -144,9 +131,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
                 print str(error)
 
     def send_example_email(self):
-        """ Sends an email with the required token so a user can recover
-        his/her password
-
+        """
+        Sends an example email with the subject Hello.
         """
         title = _("Hello")
         template = "example_email"
