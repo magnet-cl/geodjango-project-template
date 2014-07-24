@@ -1,5 +1,8 @@
 from artichoke import Config as ArtichokeConfig
-from fabric.api import env, task
+from fabric.api import env
+from fabric.api import task
+
+# standard library
 from os import path
 
 # local and remote paths
@@ -12,6 +15,10 @@ env.server_domain = 'example.com'
 # git repositories
 env.server_git_url = 'example/url.git'
 
+# prefix used by configuration files
+env.prefix = path.split(env.server_git_url)[1]  # split tail
+env.prefix = path.splitext(env.prefix)[0]  # discard git suffix
+
 
 class Config(ArtichokeConfig):
     def __init__(self, env, config_file=None):
@@ -23,10 +30,10 @@ class Config(ArtichokeConfig):
 
 
 @task
-def set(address='cl', user='magnet', branch='master', django_port='8000'):
+def set(address='default', user='magnet', branch='master', django_port='8000'):
     """ Address, user, branch and django port setter with shortcuts. """
     # host
-    if address == 'cl':
+    if address == 'default':
         env.hosts = ['example.com']
     else:
         # TODO Validate input

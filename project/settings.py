@@ -164,6 +164,20 @@ TEMPLATE_LOADERS = (
     )),
 )
 
+# List of processors used by RequestContext to populate the context.
+# Each one should be a callable that takes the request object as its
+# only parameter and returns a dictionary to add to the context.
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -247,6 +261,11 @@ COMPRESS_PRECOMPILERS = (
     ('text/less', 'node_modules/less/bin/lessc {infile} > {outfile}'),
     ('text/jade', 'base.filters.jade.JadeCompilerFilter'),
 )
+
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter',
+]
 
 # user loggin
 LOGIN_REDIRECT_URL = "/"
